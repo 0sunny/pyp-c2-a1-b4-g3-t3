@@ -15,19 +15,8 @@ class Board(object):
         self.filled_positions = set()
         self.shots_fired = set()
         self.last_shot = None
-        #self.attack_shots = 10
         self.defender_says = None
-    """    
-    def is_game_over(self):
-        filled_undamaged_positions = self.filled_positions - self.shots_fired
-        if len(filled_undamaged_positions) == 0 and \
-        len(self.filled_positions) > 0:
-            return True
-        if len(self.shots_fired) >= self.attack_shots:
-            #Game lost by attacker
-            return True
-        return False
-    """    
+
     def display(self, player):
         """Display the board on the console."""
         #raise NotImplementedError
@@ -130,8 +119,6 @@ class Player(object):
             end_position = position[0] + str(int(position[1:]) + size - 1)
             range_positions = [position[0] + str(int(position[1:]) + i) 
             for i in xrange(0, size)]
-        #print range_positions
-        #print end_position
         #Check if position or end_position is out of board
         if not \
         (int(board.row_min) <= int(position[1:]) <= int(board.row_max) and \
@@ -166,13 +153,12 @@ class Human(Player):
                         if inp in ["hit", "miss"]:
                             board.defender_says = inp
                             break
+                        else:
+                            raise ValueError
                     except KeyboardInterrupt:
+                        raise
+                    except ValueError:
                         print "Enter a valid value: either 'hit' or 'miss'."
-                #Leaving the below hit or miss for verification.        
-                if board.last_shot in board.filled_positions:
-                    print "Hit"
-                else:
-                    print "Miss"
             else:
                 #Setup the board
                 self.position_the_board(board)
