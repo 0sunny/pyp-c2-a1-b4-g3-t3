@@ -15,9 +15,9 @@ class Board(object):
         self.filled_positions = set()
         self.shots_fired = set()
         self.last_shot = None
-        self.attack_shots = 10
+        #self.attack_shots = 10
         self.defender_says = None
-        
+    """    
     def is_game_over(self):
         filled_undamaged_positions = self.filled_positions - self.shots_fired
         if len(filled_undamaged_positions) == 0 and \
@@ -27,8 +27,8 @@ class Board(object):
             #Game lost by attacker
             return True
         return False
-        
-    def display_board(self, player):
+    """    
+    def display(self, player):
         """Display the board on the console."""
         #raise NotImplementedError
         print "_", 
@@ -74,7 +74,7 @@ class Player(object):
         the form A9 ..etc"""
         raise NotImplementedError
     
-    def valid_position_missile(self, position, board):
+    def valid_missile_position(self, position, board):
         """Fire the missile on the corresponding position. The position is of 
         the form A9 ..etc"""
         try:
@@ -98,7 +98,7 @@ class Player(object):
         else:
             return True
     
-    def player_move(self, board):
+    def move(self, board):
         """Call the required move based on mode the player is in."""
         if self.player_mode == "A":
             self.fire_the_missile(board)
@@ -152,7 +152,7 @@ class Player(object):
 class Human(Player):
     """The human player class"""
     
-    def player_move(self, board):
+    def move(self, board):
         """Call the required move based on mode the player is in."""
         if self.player_mode == "A":
             self.fire_the_missile(board)
@@ -180,7 +180,7 @@ class Human(Player):
     def fire_the_missile(self, board):
         while True:
             position = raw_input("Select a firing position: ")
-            if self.valid_position_missile(position, board):
+            if self.valid_missile_position(position, board):
                 board.shots_fired.add(position)
                 board.last_shot = position
                 print "The attacker fired at {} position".format(position)
@@ -210,7 +210,7 @@ class Human(Player):
 class Computer(Player):
     """"The computer player class"""
     
-    def player_move(self, board):
+    def move(self, board):
         """Call the required move based on mode the player is in."""
         if self.player_mode == "A":
             if len(board.shots_fired) > 0:
@@ -244,7 +244,7 @@ class Computer(Player):
             letter = random.choice(letters)
             number = str(random.randint(int(board.row_min), int(board.row_max)))
             position = letter + number
-            if self.valid_position_missile(position, board):
+            if self.valid_missile_position(position, board):
                 board.shots_fired.add(position)
                 board.last_shot = position
                 print "The attacker fired at {} position".format(position)
@@ -275,30 +275,44 @@ class Computer(Player):
 class GameEngine(object):
     """Implements the game logic."""
     
-    def __init__(self):
+    def __init__(self, max_shots = 10):
         """Initialize the game."""
         self.board = Board()
         modes = ["A", "D"]
         random.shuffle(modes)
         self.human = Human(modes[0])
         self.computer = Computer(modes[1])
-    
+        self.attack_shots = max_shots
+        
+    def is_game_over(self):
+        filled_undamaged_positions = self.board.filled_positions - self.board.shots_fired
+        if len(filled_undamaged_positions) == 0 and \
+        len(self.board.filled_positions) > 0:
+            return True
+        if len(self.board.shots_fired) >= self.attack_shots:
+            #Game lost by attacker
+            return True
+        return False
+
     def run(self):
         """Start the game and run it completion."""
         print "Player is in {} mode".format(self.human.player_mode)
         
         #Start playing
-        while not self.board.is_game_over():
+        while not self.is_game_over():
             if self.human.player_mode == "D":
-                self.human.player_move(self.board)
+                self.human.move(self.board)
                 print "Displaying the board, for the next shot"
-                self.board.display_board(self.human)
-                self.computer.player_move(self.board)
+                self.board.display(self.human)
+                self.computer.move(self.board)
             else:
-                self.computer.player_move(self.board)
+                self.computer.move(self.board)
                 print "Displaying the board, for the next shot"
-                self.board.display_board(self.human)
-                self.human.player_move(self.board)
+                self.board.display(self.human)
+                self.human.move(self.board)
+        #Call the diplay board and player move after the 10 shots of attacker are done.
+        self.board.display(self.human)
+        self.computer.move(self.board)
         self.metrics()
     
     def metrics(self):
@@ -312,26 +326,7 @@ class GameEngine(object):
 
 
 if __name__ == "__main__":
-    """test the classes."""
-    """
-    b = Board()
-    
-    print b.is_game_over()
-    
-    b.display_board()
-    
-    p1 = Human("A")
-    p2 = Computer("D")
-    
-    p1.player_move(b)
-    
-    b.display_board()
-    
-    p2.player_move(b)
-    
-    print b.last_shot
-    print b.shots_fired
-    """
+    """Run the game."""
     
     game = GameEngine()
     game.run()
