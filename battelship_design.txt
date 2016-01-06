@@ -1,0 +1,33 @@
+"""Design aspect of the program."""
+"""
+Board class -> 10x10 A- , 1-10
+-- Display board
+-- filled_positions
+-- shots_positions
+-- filled_undamaged_positions -- updated each time a shot is fired
+-- if len(filled_undamaged_positions) == 0 game over #or len(shots_positions) > 50
+
+
+Player class ->
+-- position_the_board
+-- valid_move --> appropriate reason () out of bounds or colliding with other.)
+-- fire_the_missile(board, position)(The position has to be on board -->hit or miss)
+-- #shots_fired
+-- player_mode - Attack or defend
+-- player_move - basically calls fire_the_missile or (position_the_board and then tell if its a hit or miss)
+
+Human(Player) class ->
+-- ask user input for position the board
+-- fire_the_missile human input
+
+computer(Player) class ->
+-- Assign the board at random
+-- fire the missile at random (update -- according to extras)
+
+game_engine class/function ->
+-- start_the_game, display information
+-- Change the modes of the game
+--provide_stats_after_game_done
+
+
+"""
